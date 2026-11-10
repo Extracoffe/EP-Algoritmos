@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <title>KDS - Painel do Fast-Food</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <h1> Sistema de Pedidos - Fast-Food (Node.js)</h1>
+
+  <div class="grid">
+    <!-- Caixa: Cadastro -->
+    <div class="card">
+      <h2>Caixa - Novo Pedido</h2>
+      <input type="text" id="cliente" placeholder="Nome do Cliente">
+      <input type="text" id="produto" placeholder="Produto (Ex: X-Salada)">
+      <input type="number" id="quantidade" placeholder="Quantidade" value="1">
+      <input type="number" id="preco" placeholder="Preço Unitário (R$)" step="0.01">
+      <button onclick="cadastrarPedido()">Cadastrar Pedido</button>
+    </div>
+
+    <!-- Cozinha: Fila de Espera -->
+    <div class="card">
+      <h2>Cozinha - Fila de Preparo</h2>
+      <button class="btn-preparar" onclick="prepararProximo()">Preparar Próximo Pedido</button>
+      <div id="lista-fila">Carregando fila...</div>
+    </div>
+
+    <!-- Histórico: Pilha -->
+    <div class="card">
+      <h2>Histórico (Pedidos Prontos)</h2>
+      <div id="lista-historico">Carregando histórico...</div>
+    </div>
+  </div>
+
+  <script>
+    async function atualizarDados() {
+      // Atualizar Fila
+      let resFila = await fetch('/api/pedidos');
+      let fila = await resFila.json();
+      let htmlFila = fila.length === 0 ? '<p>Nenhum pedido aguardando.</p>' : '';
+      fila.forEach(p => {
+        htmlFila += `<div class="pedido-item">
+                    <strong>#${p.id} - ${p.cliente}</strong><br>
+                    Item: ${p.produto} (Qtd: ${p.quantidade})<br>
+                    Valor: R$ ${p.preco.toFixed(2)}
+                </div>`;
+      });
+      document.getElementById('lista-fila').innerHTML = htmlFila;
+
+      // Atualizar Histórico
+      let resHist = await fetch('/api/historico');
+      let hist = await resHist.json();
+      let htmlHist = hist.length === 0 ? '<p>Nenhum pedido preparado ainda.</p>' : '';
+      hist.forEach(p => {
+        htmlHist += `<div class="historico-item">
+                    <strong>#${p.id} - ${p.cliente}</strong><br>
+                    Item: ${p.produto} (Pronto ✅)
+                </div>`;
+      });
+      document.getElementById('lista-historico').innerHTML = htmlHist;
+    }
+
+    async function cadastrarPedido() {
+      let cliente = document.getElementById('cliente').value;
+      let produto = document.getElementById('produto').value;
+      let quantidade = document.getElementById('quantidade').value;
+      let preco = document.getElementById('preco').value;
+
+      if (!cliente || !produto || !preco) {
+        alert('Preencha todos os campos!');
+        return;
+      }
+
+      await fetch('/api/pedidos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ cliente, produto, quantidade, preco })
+      });
+
+      document.getElementById('cliente').value = '';
+      document.getElementById('produto').value = '';
+      document.getElementById('quantidade').value = '1';
+      document.getElementById('preco').value = '';
+      atualizarDados();
+    }
+
+    async function prepararProximo() {
+      let res = await fetch('/api/preparar', { method: 'POST' });
+      if (!res.ok) {
+        alert('Não há pedidos na fila para preparar!');
+      }
+      atualizarDados();
+    }
+
+    setInterval(atualizarDados, 2000);
+    atualizarDados();
+  </script>
+</body>
+
+</html>

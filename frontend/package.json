@@ -1,0 +1,12 @@
+{
+  "name": "fastfood-kds",
+  "version": "1.0.0",
+  "description": "Sistema de Gerenciamento de Pedidos - Fast-Food",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}
