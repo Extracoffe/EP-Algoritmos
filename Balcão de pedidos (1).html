@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Balcão de pedidos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;800&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#1d2730;--bg2:#26333e;--line:#3a4b59;--paper:#fbfaf6;--ink:#1c1c1c;--red:#d62f2f;--mustard:#ffc531;--mute:#9db0be;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:#eef3f6;font:16px/1.5 "Bricolage Grotesque","Segoe UI",system-ui,sans-serif}
+header{padding:28px clamp(16px,4vw,48px) 8px;max-width:1280px;margin:0 auto}
+h1{margin:0;font-size:clamp(2rem,5vw,3.2rem);font-weight:800;letter-spacing:-.02em;line-height:1}
+header p{margin:10px 0 0;color:var(--mute);max-width:64ch}
+.layout{display:grid;grid-template-columns:minmax(260px,320px) 1fr 1fr;gap:24px;padding:20px clamp(16px,4vw,48px) 40px;max-width:1280px;margin:0 auto;align-items:start}
+@media(max-width:900px){.layout{grid-template-columns:1fr}}
+section{background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:18px}
+h2{margin:0 0 14px;font-size:1.15rem;font-weight:600;display:flex;justify-content:space-between;align-items:center;gap:8px}
+h2 .n{background:var(--mustard);color:#1c1c1c;border-radius:999px;min-width:28px;padding:0 9px;text-align:center;font-size:.95rem;font-weight:800}
+label{display:block;margin-bottom:12px;font-size:.95rem}
+input{display:block;width:100%;margin-top:4px;padding:9px 10px;border-radius:6px;border:1px solid var(--line);background:#16202a;color:inherit;font:inherit}
+input:focus-visible,button:focus-visible{outline:3px solid var(--mustard);outline-offset:2px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.erro{display:block;color:#ff9a8f;font-size:.85rem;min-height:1.2em}
+button{font:inherit;font-weight:600;border:0;border-radius:6px;padding:10px 14px;cursor:pointer;background:var(--red);color:#fff}
+button.sec{background:transparent;border:1px solid var(--line);color:var(--mute)}
+button:disabled{opacity:.4;cursor:not-allowed}
+.full{width:100%}
+.acoes{margin-bottom:14px}
+.lista{display:flex;flex-direction:column;gap:12px}
+.ticket{position:relative;background:var(--paper);color:var(--ink);border-radius:4px 4px 0 0;padding:12px 14px 14px;font-family:"Courier Prime","Courier New",monospace;border-bottom:3px dashed #b9b6a8}
+.ticket h3{margin:0;font-size:1.1rem;color:var(--red)}
+.ticket p{margin:2px 0 0}
+.ticket .cli{font-weight:700}
+.ticket .preco{font-size:.85rem;color:#555;margin-top:6px}
+.tag{position:absolute;top:-9px;right:10px;background:var(--mustard);color:#1c1c1c;font:600 .75rem "Bricolage Grotesque",sans-serif;padding:1px 9px;border-radius:999px}
+.novo{animation:entra .35s ease-out}
+@keyframes entra{from{transform:translateY(-10px);opacity:0}to{transform:none;opacity:1}}
+@media(prefers-reduced-motion:reduce){.novo{animation:none}}
+.vazio{color:var(--mute);margin:0}
+#pilha .ticket{opacity:.92}
+#pilha .ticket:not(:first-child){margin-top:-4px}
+.atividade{grid-column:1/-1}
+.atividade ul{list-style:none;margin:0;padding:0;color:var(--mute)}
+.atividade li:first-child{color:#eef3f6}
+select{padding:6px 8px;border-radius:6px;border:1px solid var(--line);background:#16202a;color:inherit;font:inherit}
+.demo{grid-column:1/-1}
+.vel{display:flex;gap:8px;align-items:center;margin:0;font-size:.9rem;font-weight:400}
+.demo-grid{display:grid;grid-template-columns:minmax(280px,1fr) 1.3fr;gap:20px}
+@media(max-width:900px){.demo-grid{grid-template-columns:1fr}}
+.fn{margin:0 0 8px;color:var(--mute);font-family:"Courier Prime","Courier New",monospace}
+.codigo{margin:0;background:#16202a;border:1px solid var(--line);border-radius:6px;padding:10px 0;font:14px/1.6 "Courier Prime","Courier New",monospace;overflow-x:auto;min-height:12em}
+.codigo span{display:block;padding:0 14px;white-space:pre}
+.codigo .on{background:var(--mustard);color:#1c1c1c;font-weight:700}
+.explica{margin:12px 0 0;min-height:3em}
+.mem{background:#16202a;border:1px solid var(--line);border-radius:6px;padding:12px;margin-bottom:12px;overflow-x:auto}
+.mem-t{color:var(--mute);margin-bottom:8px;font-size:.9rem}
+.cadeia{display:flex;align-items:flex-end;gap:8px;min-height:60px}
+.no{display:flex;flex-direction:column;align-items:center;gap:4px}
+.chips{display:flex;gap:4px;min-height:22px}
+.chip{background:var(--mustard);color:#1c1c1c;font-size:.75rem;font-weight:600;padding:0 8px;border-radius:999px}
+.caixa{background:var(--paper);color:var(--ink);border-radius:4px;padding:4px 10px;font:700 1rem "Courier Prime","Courier New",monospace;white-space:nowrap}
+.seta,.nulo{color:var(--mute);font-family:"Courier Prime","Courier New",monospace;padding-bottom:4px}
+.solto{opacity:.6}
+button.ligado{background:var(--mustard);color:#1c1c1c;border-color:var(--mustard)}
+</style>
+</head>
+<body>
+<header>
+  <h1>Balcão de pedidos</h1>
+  <p>A fila prepara primeiro quem chegou primeiro. O histórico é uma pilha: o último pedido preparado fica no topo e é o primeiro a poder voltar para a fila.</p>
+  <p>Este site executa o <strong>seu código em C original</strong> (main.c, fila.c, pilha.c e cabeçalhos), sem reescrita: os arquivos são carregados exatamente como estão e rodados por um interpretador de C embutido na página. Os botões apenas digitam as opções do menu na entrada (stdin) do programa.</p>
+  <p><button class="sec" id="auto" type="button" aria-pressed="false">Ligar modo automático</button></p>
+</header>
+
+<main class="layout">
+  <section aria-labelledby="t-cad">
+    <h2 id="t-cad">Cadastrar pedido</h2>
+    <form id="form" novalidate>
+      <label>Nome do cliente
+        <input name="cliente" maxlength="49" autocomplete="off">
+        <span class="erro" data-erro="cliente"></span></label>
+      <label>Produto
+        <input name="produto" maxlength="49" autocomplete="off">
+        <span class="erro" data-erro="produto"></span></label>
+      <div class="row">
+        <label>Quantidade
+          <input name="quantidade" inputmode="numeric" autocomplete="off">
+          <span class="erro" data-erro="quantidade"></span></label>
+        <label>Preço unitário (R$)
+          <input name="preco" inputmode="decimal" autocomplete="off">
+          <span class="erro" data-erro="preco"></span></label>
+      </div>
+      <button class="full" type="submit">Adicionar à fila</button>
+    </form>
+    <p style="margin:16px 0 0"><button class="sec full" id="zerar" type="button">Zerar tudo</button></p>
+  </section>
+
+  <section aria-labelledby="t-fila">
+    <h2 id="t-fila">Aguardando <span class="n" id="n-fila">0</span></h2>
+    <div class="acoes"><button class="full" id="preparar" type="button">Preparar próximo pedido</button></div>
+    <div class="lista" id="fila"></div>
+  </section>
+
+  <section aria-labelledby="t-hist">
+    <h2 id="t-hist">Preparados <span class="n" id="n-pilha">0</span></h2>
+    <div class="acoes"><button class="full" id="recuperar" type="button">Recuperar último preparado</button></div>
+    <div class="lista" id="pilha"></div>
+  </section>
+
+  <section class="demo" aria-labelledby="t-demo">
+    <h2 id="t-demo">Código C ao vivo
+      <label class="vel">Velocidade
+        <select id="vel"><option value="1100">Lenta</option><option value="600">Normal</option><option value="200" selected>Rápida</option><option value="0">Sem pausa</option></select>
+      </label>
+    </h2>
+    <div class="demo-grid">
+      <div>
+        <div class="acoes" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><button class="sec" id="volta" type="button" disabled>◀ Voltar</button><button class="sec" id="pausa" type="button">⏸ Pausar</button><button class="sec" id="avanca" type="button" disabled>Avançar ▶</button><span id="pos" style="color:var(--mute);font-size:.9rem"></span></div>
+        <p class="fn" id="fn">Nenhuma função em execução</p>
+        <pre class="codigo" id="codigo" aria-label="Código em execução"></pre>
+        <p class="explica" id="explica">Cadastre um pedido, prepare o próximo ou recupere o último para ver o seu código C (fila.c e pilha.c) rodando linha a linha.</p>
+      </div>
+      <div>
+        <div class="mem" id="mem-fila"></div>
+        <div class="mem" id="mem-pilha"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="demo" aria-labelledby="t-term">
+    <h2 id="t-term">Saída do programa (stdout)
+      <span><button class="sec" type="button" data-c="2">2 · Mostrar fila</button> <button class="sec" type="button" data-c="4">4 · Histórico</button></span></h2>
+    <pre class="codigo" id="term" aria-live="polite" style="padding:10px 14px;white-space:pre-wrap;max-height:18em;overflow:auto"></pre>
+    <form id="raw" style="display:flex;gap:8px;margin-top:10px"><input id="rawin" placeholder="Digite como no terminal (stdin) e tecle Enter" autocomplete="off" aria-label="Entrada do programa"><button class="sec" type="submit">Enviar</button></form>
+  </section>
+
+  <section class="atividade" aria-labelledby="t-log">
+    <h2 id="t-log">Atividade recente</h2>
+    <ul id="log" aria-live="polite"></ul>
+  </section>
+</main>
+
+<script id="fontes" type="application/json">{"pedidos.h": "#ifndef PEDIDOS_H\n#define PEDIDOS_H\n\ntypedef struct {\n    int id;\n    char cliente[50];\n    char produto[50];\n    int quantidade;\n    float preco;\n} Pedido;\n\n#endif", "fila.h": "#ifndef FILA_H\n#define FILA_H\n\n#include \"pedidos.h\"\n\ntypedef struct No {\n    Pedido pedido;\n    struct No *proximo;\n} No;\n\ntypedef struct {\n    No *inicio;\n    No *fim;\n    int quantidade;\n} Fila;\n\nvoid inicializarFila(Fila *fila);\nint filaVazia(Fila *fila);\nvoid adicionarPedido(Fila *fila, Pedido pedido);\nint removerPedido(Fila *fila, Pedido *pedido);\nvoid mostrarFila(Fila *fila);\nvoid liberarFila(Fila *fila);\nvoid inserirInicio(Fila *fila, Pedido pedido);\n\n\n#endif", "pilha.h": "#ifndef PILHA_H\n#define PILHA_H\n\n#include \"pedidos.h\"\n\ntypedef struct NoPilha {\n    Pedido pedido;\n    struct NoPilha *proximo;\n} NoPilha;\n\ntypedef struct {\n    NoPilha *topo;\n    int quantidade;\n} Pilha;\n\nvoid inicializarPilha(Pilha *pilha);\nint pilhaVazia(Pilha *pilha);\nint empilhar(Pilha *pilha, Pedido pedido);\nint desempilhar(Pilha *pilha, Pedido *pedido);\nvoid mostrarPilha(Pilha *pilha);\nvoid liberarPilha(Pilha *pilha);\n\n#endif", "fila.c": "#include <stdio.h>\n#include <stdlib.h>\n#include \"fila.h\"\n\n// Inicializa a fila\nvoid inicializarFila(Fila *fila) {\n    fila->inicio = NULL;\n    fila->fim = NULL;\n    fila->quantidade = 0;\n}\n\n// Verifica se a fila está vazia\nint filaVazia(Fila *fila) {\n    return fila->inicio == NULL;\n}\n\n// Adiciona um pedido no final da fila\nvoid adicionarPedido(Fila *fila, Pedido pedido) {\n\n    No *novo = malloc(sizeof(No));\n\n    if (novo == NULL) {\n        printf(\"Erro ao alocar memoria!\\n\");\n        return;\n    }\n\n    novo->pedido = pedido;\n    novo->proximo = NULL;\n\n    if (filaVazia(fila)) {\n        fila->inicio = novo;\n    } else {\n        fila->fim->proximo = novo;\n    }\n\n    fila->fim = novo;\n    fila->quantidade++;\n\n    printf(\"Pedido %d adicionado com sucesso!\\n\", pedido.id);\n}\n\n// Remove o primeiro pedido da fila\nint removerPedido(Fila *fila, Pedido *pedido) {\n\n    if (filaVazia(fila)) {\n        printf(\"Nao existem pedidos na fila!\\n\");\n        return 0;\n    }\n\n    No *auxiliar = fila->inicio;\n\n    *pedido = auxiliar->pedido;\n\n    fila->inicio = auxiliar->proximo;\n\n    if (fila->inicio == NULL) {\n        fila->fim = NULL;\n    }\n\n    free(auxiliar);\n\n    fila->quantidade--;\n\n    return 1;\n}\n\n// Mostra todos os pedidos aguardando\nvoid mostrarFila(Fila *fila) {\n\n    if (filaVazia(fila)) {\n        printf(\"Fila vazia!\\n\");\n        return;\n    }\n\n    No *atual = fila->inicio;\n\n    printf(\"\\n--- PEDIDOS AGUARDANDO ---\\n\");\n\n    while (atual != NULL) {\n\n        printf(\"Pedido: %d\\n\", atual->pedido.id);\n        printf(\"Cliente: %s\\n\", atual->pedido.cliente);\n        printf(\"Produto: %s\\n\", atual->pedido.produto);\n        printf(\"Quantidade: %d\\n\", atual->pedido.quantidade);\n        printf(\"Preco: R$ %.2f\\n\", atual->pedido.preco);\n\n        printf(\"-------------------------\\n\");\n\n        atual = atual->proximo;\n    }\n}\n\n// Libera a memoria utilizada pela fila\nvoid liberarFila(Fila *fila) {\n\n    No *atual = fila->inicio;\n\n    while (atual != NULL) {\n\n        No *auxiliar = atual;\n        atual = atual->proximo;\n\n        free(auxiliar);\n    }\n\n    fila->inicio = NULL;\n    fila->fim = NULL;\n    fila->quantidade = 0;\n}\n\n// Insere um pedido no inicio da fila\nvoid inserirInicio(Fila *fila, Pedido pedido) {\n\n    No *novo = malloc(sizeof(No));\n\n    if (novo == NULL) {\n        printf(\"Erro ao alocar memoria!\\n\");\n        return;\n    }\n\n    novo->pedido = pedido;\n    novo->proximo = fila->inicio;\n\n    fila->inicio = novo;\n\n    if (fila->fim == NULL) {\n        fila->fim = novo;\n    }\n\n    fila->quantidade++;\n\n    printf(\"Pedido %d recuperado para a fila!\\n\", pedido.id);\n}", "pilha.c": "#include <stdio.h>\n#include <stdlib.h>\n#include \"pilha.h\"\n\n// Inicializa a pilha\nvoid inicializarPilha(Pilha *pilha) {\n    pilha->topo = NULL;\n    pilha->quantidade = 0;\n}\n\n// Verifica se a pilha está vazia\nint pilhaVazia(Pilha *pilha) {\n    return pilha->topo == NULL;\n}\n\n// Adiciona um pedido ao topo da pilha\nint empilhar(Pilha *pilha, Pedido pedido) {\n\n    NoPilha *novo = malloc(sizeof(NoPilha));\n\n    if (novo == NULL) {\n        printf(\"Erro ao alocar memoria!\\n\");\n        return 0;\n    }\n\n    novo->pedido = pedido;\n    novo->proximo = pilha->topo;\n\n    pilha->topo = novo;\n    pilha->quantidade++;\n\n    return 1;\n}\n\n// Remove o pedido que está no topo\nint desempilhar(Pilha *pilha, Pedido *pedido) {\n\n    if (pilhaVazia(pilha)) {\n        printf(\"Pilha vazia!\\n\");\n        return 0;\n    }\n\n    NoPilha *auxiliar = pilha->topo;\n\n    *pedido = auxiliar->pedido;\n\n    pilha->topo = auxiliar->proximo;\n\n    free(auxiliar);\n\n    pilha->quantidade--;\n\n    return 1;\n}\n\n// Mostra os pedidos preparados, do mais recente ao mais antigo\nvoid mostrarPilha(Pilha *pilha) {\n\n    if (pilhaVazia(pilha)) {\n        printf(\"Historico de pedidos vazio!\\n\");\n        return;\n    }\n\n    NoPilha *atual = pilha->topo;\n\n    printf(\"\\n--- HISTORICO DE PEDIDOS PREPARADOS ---\\n\");\n\n    while (atual != NULL) {\n\n        printf(\"Pedido: %d\\n\", atual->pedido.id);\n        printf(\"Cliente: %s\\n\", atual->pedido.cliente);\n        printf(\"Produto: %s\\n\", atual->pedido.produto);\n\n        printf(\"-------------------------\\n\");\n\n        atual = atual->proximo;\n    }\n}\n\n// Libera a memoria utilizada pela pilha\nvoid liberarPilha(Pilha *pilha) {\n\n    NoPilha *atual = pilha->topo;\n\n    while (atual != NULL) {\n\n        NoPilha *auxiliar = atual;\n        atual = atual->proximo;\n\n        free(auxiliar);\n    }\n\n    pilha->topo = NULL;\n    pilha->quantidade = 0;\n}", "main.c": "\n#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n#include <ctype.h>\n\n#include \"pedidos.h\"\n#include \"fila.h\"\n#include \"pilha.h\"\n\n\n// Le a quantidade e verifica se e um numero inteiro positivo\nint lerInteiroPositivo(const char *mensagem) {\n    char entrada[100];\n    char caractereExtra;\n    int valor;\n\n    while (1) {\n        printf(\"%s\", mensagem);\n\n        if (fgets(entrada, sizeof(entrada), stdin) == NULL) {\n            exit(0);\n        }\n\n        if (sscanf(entrada, \"%d %c\", &valor, &caractereExtra) == 1\n            && valor > 0) {\n            return valor;\n        }\n\n        printf(\"Entrada invalida! Digite um numero inteiro maior que zero.\\n\");\n    }\n}\n\n\n// Le o preco e verifica se e positivo\nfloat lerPrecoPositivo(const char *mensagem) {\n    char entrada[100];\n    char caractereExtra;\n    float valor;\n\n    while (1) {\n        printf(\"%s\", mensagem);\n\n        if (fgets(entrada, sizeof(entrada), stdin) == NULL) {\n            exit(0);\n        }\n\n        if (sscanf(entrada, \"%f %c\", &valor, &caractereExtra) == 1\n            && valor > 0) {\n            return valor;\n        }\n\n        printf(\"Entrada invalida!\\n\");\n    }\n}\n\n\n// Le um texto e impede que o campo fique vazio ou ultrapasse o limite\nvoid lerTexto(const char *mensagem, char destino[], size_t tamanho) {\n    int caractere;\n    int possuiConteudo;\n\n    while (1) {\n        printf(\"%s\", mensagem);\n\n        if (fgets(destino, tamanho, stdin) == NULL) {\n            exit(0);\n        }\n\n        if (strchr(destino, '\\n') == NULL) {\n            caractere = getchar();\n\n            if (caractere != '\\n' && caractere != EOF) {\n                while ((caractere = getchar()) != '\\n' && caractere != EOF) {\n                }\n\n                printf(\"Texto muito longo! Tente novamente.\\n\");\n                continue;\n            }\n        }\n\n        destino[strcspn(destino, \"\\n\")] = '\\0';\n\n        possuiConteudo = 0;\n\n        for (int i = 0; destino[i] != '\\0'; i++) {\n            if (!isspace((unsigned char)destino[i])) {\n                possuiConteudo = 1;\n                break;\n            }\n        }\n\n        if (possuiConteudo) {\n            return;\n        }\n\n        printf(\"O campo nao pode ficar vazio!\\n\");\n    }\n}\n\n\nint main() {\n    Fila filaPedidos;\n    Pilha historicoPedidos;\n\n    inicializarFila(&filaPedidos);\n    inicializarPilha(&historicoPedidos);\n\n    int opcao = -1;\n    int proximoId = 1;\n    char entrada[100];\n    char caractereExtra;\n\n    Pedido novoPedido;\n    Pedido pedidoProcessado;\n\n    do {\n        printf(\"\\n===== GERENCIAMENTO DE PEDIDOS =====\\n\");\n        printf(\"1 - Cadastrar pedido\\n\");\n        printf(\"2 - Mostrar pedidos aguardando\\n\");\n        printf(\"3 - Preparar proximo pedido\\n\");\n        printf(\"4 - Consultar historico de preparados\\n\");\n        printf(\"5 - Recuperar ultimo pedido preparado\\n\");\n        printf(\"0 - Sair\\n\");\n        printf(\"Escolha uma opcao: \");\n\n        if (fgets(entrada, sizeof(entrada), stdin) == NULL) {\n            opcao = 0;\n        } else if (sscanf(entrada, \"%d %c\", &opcao, &caractereExtra) != 1) {\n            opcao = -1;\n        }\n\n        switch (opcao) {\n            case 1:\n                printf(\"\\n--- CADASTRAR PEDIDO ---\\n\");\n\n                novoPedido.id = proximoId;\n\n                lerTexto(\"Nome do cliente: \", novoPedido.cliente,\n                         sizeof(novoPedido.cliente));\n\n                lerTexto(\"Produto: \", novoPedido.produto,\n                         sizeof(novoPedido.produto));\n\n                novoPedido.quantidade = lerInteiroPositivo(\"Quantidade: \");\n\n                novoPedido.preco = lerPrecoPositivo(\"Preco unitario: R$ \");\n\n                adicionarPedido(&filaPedidos, novoPedido);\n\n                proximoId++;\n\n                break;\n\n            case 2:\n                mostrarFila(&filaPedidos);\n                break;\n\n            case 3:\n                printf(\"\\n--- PREPARAR PEDIDO ---\\n\");\n\n                if (removerPedido(&filaPedidos, &pedidoProcessado)) {\n                    if (empilhar(&historicoPedidos, pedidoProcessado)) {\n                        printf(\"\\nPedido preparado com sucesso!\\n\");\n                        printf(\"Numero do pedido: %d\\n\", pedidoProcessado.id);\n                        printf(\"Cliente: %s\\n\", pedidoProcessado.cliente);\n                        printf(\"Produto: %s\\n\", pedidoProcessado.produto);\n                    } else {\n                        inserirInicio(&filaPedidos, pedidoProcessado);\n\n                        printf(\"Nao foi possivel registrar o pedido no historico.\\n\");\n                    }\n                }\n\n                break;\n\n            case 4:\n                mostrarPilha(&historicoPedidos);\n                break;\n\n            case 5:\n                printf(\"\\n--- RECUPERAR PEDIDO ---\\n\");\n\n                if (desempilhar(&historicoPedidos, &pedidoProcessado)) {\n                    inserirInicio(&filaPedidos, pedidoProcessado);\n\n                    printf(\"Pedido %d voltou para a fila!\\n\", pedidoProcessado.id);\n                }\n\n                break;\n\n            case 0:\n                printf(\"\\nEncerrando o sistema...\\n\");\n                break;\n\n            default:\n                printf(\"\\nOpcao invalida! Tente novamente.\\n\");\n                break;\n        }\n\n    } while (opcao != 0);\n\n    liberarFila(&filaPedidos);\n    liberarPilha(&historicoPedidos);\n\n    return 0;\n}\n"}</script>
+<script>
+// Interpretador de C (subconjunto usado no projeto). Executa os arquivos .c/.h originais, sem alterá-los.
+function CVM(SRC){
+  const ORDEM=["pedidos.h","fila.h","pilha.h","fila.c","pilha.c","main.c"];
+  const INT={k:"i",sz:4},CHR={k:"i",sz:1},UCH={k:"i",sz:1,u:1},FLT={k:"f",sz:4},VOID={k:"v",sz:1};
+  const ptr=t=>({k:"p",to:t,sz:4}),arr=(t,n)=>({k:"a",of:t,n,sz:t.sz*n});
+  const types={int:INT,char:CHR,float:FLT,void:VOID,size_t:INT},structs={},funcs={};
+  const al=t=>t.k==="a"?al(t.of):t.k==="s"?t.al:t.sz;
+  const enc=new TextEncoder(),dec8=new TextDecoder();
+  const mem=new ArrayBuffer(1<<20),dv=new DataView(mem),u8=new Uint8Array(mem);
+  const strs=[],strMap={};let strTop=0x100;
+  const strAddr=s=>{if(strMap[s]===undefined){const b=Uint8Array.from([...enc.encode(s),0]);strMap[s]=strTop;strs.push({a:strTop,b});strTop+=b.length;if(strTop>0x4000)throw Error("strings demais")}return strMap[s]};
+  // ---------- léxico ----------
+  const unesc=s=>s.replace(/\\(.)/g,(_,c)=>({n:"\n",t:"\t",0:"\0"})[c]??c);
+  function lex(file,text){
+    const re=/(\/\/[^\n]*|\/\*[\s\S]*?\*\/|#[^\n]*)|("(?:\\.|[^"\\])*")|('(?:\\.|[^'\\])+')|(\d+\.\d*(?:[eE][-+]?\d+)?|\d+)|([A-Za-z_]\w*)|(->|\+\+|--|<=|>=|==|!=|&&|\|\||[-+*\/%=<>!&.,;:(){}\[\]])|(\n)|(\s+)/g;
+    let line=1,m;const out=[];
+    while((m=re.exec(text))){
+      if(m[1]!==undefined){line+=(m[1].match(/\n/g)||[]).length;continue}
+      if(m[7]){line++;continue}if(m[8])continue;
+      const t={file,line};
+      if(m[2]){t.k="s";t.v=unesc(m[2].slice(1,-1))}
+      else if(m[3]){t.k="n";t.v=unesc(m[3].slice(1,-1)).charCodeAt(0)}
+      else if(m[4]){t.k="n";t.v=Number(m[4]);t.f=m[4].includes(".")}
+      else if(m[5]){t.k="i";t.v=m[5]}else{t.k="p";t.v=m[6]}
+      out.push(t);
+    }
+    return out;
+  }
+  // ---------- parser ----------
+  let T,i;
+  const pk=()=>T[i],nx=()=>T[i++];
+  const is=v=>T[i]&&(T[i].k==="p"||T[i].k==="i")&&T[i].v===v;
+  const eat=v=>is(v)?(i++,true):false;
+  const need=v=>{if(!eat(v)){const t=T[i]||{};throw SyntaxError(`${t.file}:${t.line}: esperado '${v}'`)}};
+  const KW=new Set(["int","char","float","void","const","unsigned","struct","size_t"]);
+  const isTy=t=>t&&t.k==="i"&&(KW.has(t.v)||!!types[t.v]);
+  function base(){
+    let uns=false;while(is("const")||is("unsigned")){uns=uns||is("unsigned");i++}
+    const w=nx();let t;
+    if(w.v==="struct"){
+      const tag=pk().k==="i"?nx().v:null;
+      const s=tag?(structs[tag]??=({k:"s",name:tag,fields:[],sz:0,al:1})):{k:"s",fields:[],sz:0,al:1};
+      if(eat("{")){let off=0,mx=1;
+        while(!eat("}")){const b=base();do{const d=decl1(b),a=al(d.t);off=Math.ceil(off/a)*a;s.fields.push({n:d.name,t:d.t,off});off+=d.t.sz;mx=Math.max(mx,a)}while(eat(","));need(";")}
+        s.al=mx;s.sz=Math.ceil(off/mx)*mx}
+      t=s;
+    }else t=types[w.v];
+    if(!t)throw SyntaxError(`${w.file}:${w.line}: tipo desconhecido ${w.v}`);
+    if(uns&&w.v==="char")t=UCH;
+    while(is("const"))i++;
+    return t;
+  }
+  function decl1(b){let t=b;while(eat("*"))t=ptr(t);const name=nx().v;
+    while(eat("[")){if(eat("]"))t=ptr(t);else{const n=nx().v;need("]");t=arr(t,n)}}
+    return{name,t}}
+  const tyStar=()=>{let t=base();while(eat("*"))t=ptr(t);need(")");return t};
+  const BIN=[["||"],["&&"],["==","!="],["<",">","<=",">="],["+","-"],["*","/","%"]];
+  const asg=()=>{const l=bin(0);if(is("=")){i++;return{k:"as",l,r:asg()}}return l};
+  function bin(p){if(p===BIN.length)return unary();let l=bin(p+1);
+    while(pk()&&pk().k==="p"&&BIN[p].includes(pk().v)){const o=nx().v;l={k:"bin",o,a:l,b:bin(p+1)}}return l}
+  function unary(){const t=pk();
+    if(t.k==="p"&&["!","-","&","*","+"].includes(t.v)){i++;return{k:"un",o:t.v,a:unary()}}
+    if(t.k==="i"&&t.v==="sizeof"){i++;if(is("(")&&isTy(T[i+1])){i++;return{k:"szt",t:tyStar()}}return{k:"sze",a:unary()}}
+    if(is("(")&&isTy(T[i+1])){i++;const ty=tyStar();return{k:"cast",t:ty,a:unary()}}
+    return postfix()}
+  function postfix(){let e=prim();
+    for(;;){const t=pk();if(!t||t.k!=="p")break;
+      if(t.v==="["){i++;const x=asg();need("]");e={k:"idx",a:e,i:x}}
+      else if(t.v==="."||t.v==="->"){i++;e={k:"mem",a:e,n:nx().v,arrow:t.v==="->"}}
+      else if(t.v==="("&&e.k==="id"){i++;const args=[];if(!eat(")")){do args.push(asg());while(eat(","));need(")")}e={k:"call",n:e.n,args}}
+      else if(t.v==="++"||t.v==="--"){i++;e={k:"post",o:t.v,a:e}}
+      else break}
+    return e}
+  function prim(){const t=nx();
+    if(t.k==="n")return{k:"num",v:t.v,f:t.f};
+    if(t.k==="s")return{k:"str",a:strAddr(t.v)};
+    if(t.k==="i")return{k:"id",n:t.v};
+    if(t.v==="("){const e=asg();need(")");return e}
+    throw SyntaxError(`${t.file}:${t.line}: token inesperado ${t.v}`)}
+  function declStmt(){const b=base(),list=[];
+    do{const d=decl1(b);d.init=eat("=")?asg():null;list.push(d)}while(eat(","));need(";");return{k:"decl",list}}
+  function block(){need("{");const l=[];while(!is("}"))l.push(stmt());const e=nx();return{k:"blk",l,end:e.line,line:e.line,file:e.file}}
+  function stmt(){
+    const t=pk(),mk=o=>(o.line=t.line,o.file=t.file,o);
+    if(is("{"))return block();
+    if(is("if")){i++;need("(");const c=asg();need(")");const a=stmt(),b=eat("else")?stmt():null;return mk({k:"if",c,a,b})}
+    if(is("while")){i++;need("(");const c=asg();need(")");return mk({k:"wh",c,b:stmt()})}
+    if(is("do")){i++;const b=stmt();need("while");need("(");const c=asg();need(")");need(";");return mk({k:"do",c,b})}
+    if(is("for")){i++;need("(");let ini=null;
+      if(isTy(pk()))ini=mk(declStmt());else{if(!is(";"))ini=mk({k:"ex",e:asg()});need(";")}
+      const c=is(";")?null:asg();need(";");const s=is(")")?null:asg();need(")");return mk({k:"for",ini,c,s,b:stmt()})}
+    if(is("switch")){i++;need("(");const c=asg();need(")");return mk({k:"sw",c,b:block()})}
+    if(is("case")){i++;const e=asg();need(":");return mk({k:"case",e})}
+    if(is("default")){i++;need(":");return mk({k:"dflt"})}
+    if(is("return")){i++;const e=is(";")?null:asg();need(";");return mk({k:"ret",e})}
+    if(is("break")){i++;need(";");return mk({k:"brk"})}
+    if(is("continue")){i++;need(";");return mk({k:"cnt"})}
+    if(eat(";"))return mk({k:"nop"});
+    if(isTy(t))return mk(declStmt());
+    const e=asg();need(";");return mk({k:"ex",e})}
+  function parseAll(){
+    T=ORDEM.flatMap(f=>lex(f,SRC[f]));i=0;
+    while(i<T.length){
+      if(eat("typedef")){const d=decl1(base());if(d.t.k==="s"&&!d.t.name)d.t.name=d.name;types[d.name]=d.t;need(";");continue}
+      const f0=pk(),d=decl1(base());
+      if(!eat("("))throw SyntaxError(`${f0.file}:${f0.line}: declaração global não suportada`);
+      const ps=[];
+      if(!eat(")")){do{if(is("void")&&T[i+1].v===")"){i++;break}ps.push(decl1(base()))}while(eat(","));need(")")}
+      if(is("{")){const body=block();funcs[d.name]={name:d.name,ret:d.t,ps,body,file:f0.file,l0:f0.line,l1:body.end}}else need(";")}
+  }
+  // ---------- memória e execução ----------
+  let sp,hp,frames,inq,qh,out,tty,notes,freeL,sizes,gen;
+  const segv=()=>Error("Falha de segmentação: acesso a ponteiro NULL");
+  const ld=(t,a)=>{if(a<16)throw segv();return t.k==="f"?dv.getFloat32(a,true):t.k==="p"?dv.getUint32(a,true):t.sz===1?(t.u?u8[a]:dv.getInt8(a)):dv.getInt32(a,true)};
+  const st=(t,a,v)=>{if(a<16)throw segv();if(t.k==="f")dv.setFloat32(a,v,true);else if(t.k==="p")dv.setUint32(a,v>>>0,true);else if(t.sz===1)dv.setInt8(a,v);else dv.setInt32(a,Math.trunc(v),true)};
+  const val=(t,a)=>t.k==="a"||t.k==="s"?a:ld(t,a);
+  const dec=r=>r.t.k==="a"?{t:ptr(r.t.of),v:r.v}:r;
+  const sal=(sz,a)=>{sp=Math.ceil(sp/a)*a;const x=sp;sp+=sz;u8.fill(0,x,x+sz);return x};
+  const look=(F,n)=>{for(let k=F.sc.length-1;k>=0;k--)if(F.sc[k].has(n))return F.sc[k].get(n);throw Error("identificador não declarado: "+n)};
+  const CMP={"==":(x,y)=>x===y,"!=":(x,y)=>x!==y,"<":(x,y)=>x<y,">":(x,y)=>x>y,"<=":(x,y)=>x<=y,">=":(x,y)=>x>=y};
+  function cv(t,v){return t.k==="f"?Math.fround(v):t.k==="p"?v>>>0:t.sz===1?(t.u?v&255:v<<24>>24):Math.trunc(v)|0}
+  function* lv(n,F){
+    if(n.k==="id"){const v=look(F,n.n);return{t:v.t,a:v.a}}
+    if(n.k==="mem"){let a,s;
+      if(n.arrow){const p=yield* ev(n.a,F);s=p.t.to;a=p.v}else{const b=yield* lv(n.a,F);s=b.t;a=b.a}
+      const f=s.fields.find(f=>f.n===n.n);if(!f)throw Error("campo inexistente: "+n.n);if(a<16)throw segv();return{t:f.t,a:a+f.off}}
+    if(n.k==="idx"){const b=dec(yield* ev(n.a,F)),x=yield* ev(n.i,F);return{t:b.t.to,a:b.v+x.v*b.t.to.sz}}
+    if(n.k==="un"&&n.o==="*"){const p=dec(yield* ev(n.a,F));return{t:p.t.to,a:p.v}}
+    throw Error("expressão não é um lvalue")}
+  function* ev(n,F){
+    switch(n.k){
+    case"num":return{t:n.f?FLT:INT,v:n.v};
+    case"str":return{t:ptr(CHR),v:n.a};
+    case"id":if(n.n==="NULL"||n.n==="stdin")return{t:ptr(VOID),v:0};if(n.n==="EOF")return{t:INT,v:-1};
+    case"mem":case"idx":{const{t,a}=yield* lv(n,F);return{t,v:val(t,a)}}
+    case"un":{
+      if(n.o==="&"){const{t,a}=yield* lv(n.a,F);return{t:ptr(t),v:a}}
+      if(n.o==="*"){const{t,a}=yield* lv(n,F);return{t,v:val(t,a)}}
+      const x=dec(yield* ev(n.a,F));return n.o==="!"?{t:INT,v:x.v?0:1}:n.o==="-"?{t:x.t,v:-x.v}:x}
+    case"bin":{
+      if(n.o==="&&"){if(!dec(yield* ev(n.a,F)).v)return{t:INT,v:0};return{t:INT,v:dec(yield* ev(n.b,F)).v?1:0}}
+      if(n.o==="||"){if(dec(yield* ev(n.a,F)).v)return{t:INT,v:1};return{t:INT,v:dec(yield* ev(n.b,F)).v?1:0}}
+      const a=dec(yield* ev(n.a,F)),b=dec(yield* ev(n.b,F)),fl=a.t.k==="f"||b.t.k==="f";
+      if(CMP[n.o])return{t:INT,v:CMP[n.o](a.v,b.v)?1:0};
+      let v;
+      if(n.o==="+")v=a.v+b.v;else if(n.o==="-")v=a.v-b.v;else if(n.o==="*")v=a.v*b.v;
+      else{if(!fl&&b.v===0)throw Error("divisão por zero");v=n.o==="/"?(fl?a.v/b.v:Math.trunc(a.v/b.v)):a.v%b.v}
+      return fl?{t:FLT,v:Math.fround(v)}:{t:INT,v:v|0}}
+    case"as":{
+      const r=yield* ev(n.r,F),{t,a}=yield* lv(n.l,F);
+      if(t.k==="s"){if(r.v<16||a<16)throw segv();u8.copyWithin(a,r.v,r.v+t.sz);return{t,v:a}}
+      st(t,a,dec(r).v);return{t,v:val(t,a)}}
+    case"post":{const{t,a}=yield* lv(n.a,F),o=ld(t,a);st(t,a,o+(n.o==="++"?1:-1));return{t,v:o}}
+    case"cast":{const x=dec(yield* ev(n.a,F));return{t:n.t,v:cv(n.t,x.v)}}
+    case"szt":return{t:INT,v:n.t.sz};
+    case"sze":return{t:INT,v:(yield* ev(n.a,F)).t.sz};
+    case"call":{
+      const args=[];for(const x of n.args)args.push(dec(yield* ev(x,F)));
+      if(LIB[n.n])return yield* LIB[n.n](args);
+      const fn=funcs[n.n];if(!fn)throw Error("função não definida: "+n.n);
+      return yield* call(fn,args)}
+    }
+    throw Error("expressão não suportada: "+n.k)}
+  function* call(fn,args){
+    const F={fn,sc:[new Map()]},sp0=sp;frames.push(F);
+    fn.ps.forEach((p,k)=>{const a=sal(p.t.sz,al(p.t));F.sc[0].set(p.name,{t:p.t,a});
+      if(p.t.k==="s")u8.copyWithin(a,args[k].v,args[k].v+p.t.sz);else st(p.t,a,args[k].v)});
+    let r;try{r=yield* ex(fn.body,F)}finally{frames.pop();sp=sp0}
+    return{t:fn.ret,v:r&&r.r!==undefined?r.r:0}}
+  function* ex(n,F){
+    if(n.k!=="blk"&&n.k!=="case"&&n.k!=="dflt")yield{file:n.file,line:n.line,fn:F.fn};
+    switch(n.k){
+    case"blk":{const sp0=sp;F.sc.push(new Map());
+      try{for(const s of n.l){const r=yield* ex(s,F);if(r)return r}}finally{F.sc.pop();sp=sp0}return}
+    case"decl":for(const d of n.list){const a=sal(d.t.sz,al(d.t));F.sc[F.sc.length-1].set(d.name,{t:d.t,a});
+      if(d.init){const r=dec(yield* ev(d.init,F));if(d.t.k==="s")u8.copyWithin(a,r.v,r.v+d.t.sz);else st(d.t,a,r.v)}}return;
+    case"ex":yield* ev(n.e,F);return;
+    case"if":if(dec(yield* ev(n.c,F)).v)return yield* ex(n.a,F);else if(n.b)return yield* ex(n.b,F);return;
+    case"wh":while(dec(yield* ev(n.c,F)).v){const r=yield* ex(n.b,F);if(r==="b")break;if(r&&r!=="c")return r}return;
+    case"do":do{const r=yield* ex(n.b,F);if(r==="b")break;if(r&&r!=="c")return r}while(dec(yield* ev(n.c,F)).v);return;
+    case"for":{const sp0=sp;F.sc.push(new Map());
+      try{if(n.ini)yield* ex(n.ini,F);
+        while(!n.c||dec(yield* ev(n.c,F)).v){const r=yield* ex(n.b,F);if(r==="b")break;if(r&&r!=="c")return r;if(n.s)yield* ev(n.s,F)}
+      }finally{F.sc.pop();sp=sp0}return}
+    case"sw":{const v=dec(yield* ev(n.c,F)).v,L=n.b.l;let s=-1;
+      for(let k=0;k<L.length;k++)if(L[k].k==="case"&&(yield* ev(L[k].e,F)).v===v){s=k;break}
+      if(s<0)s=L.findIndex(x=>x.k==="dflt");if(s<0)return;
+      for(let k=s;k<L.length;k++){const r=yield* ex(L[k],F);if(r==="b")return;if(r)return r}return}
+    case"ret":return{r:n.e?dec(yield* ev(n.e,F)).v:undefined};
+    case"brk":return"b";case"cnt":return"c";
+    }}
+  // ---------- biblioteca padrão (stdio, stdlib, string, ctype) ----------
+  const R=(v,t=INT)=>({t,v}),PC=ptr(CHR);
+  const cstr=(a,max=1e9)=>{let e=a;while(u8[e]&&e-a<max)e++;return dec8.decode(u8.subarray(a,e))};
+  const wait=function*(){yield{need:1,fn:frames[frames.length-1].fn.name}};
+  const LIB={
+    *printf(a){const f=cstr(a[0].v);let k=1;
+      const s=f.replace(/%(\.\d+)?([dscf%])/g,(m,p,c)=>{if(c==="%")return"%";const x=a[k++];
+        return c==="d"?String(Math.trunc(x.v)):c==="s"?cstr(x.v):c==="c"?String.fromCharCode(x.v&255):x.v.toFixed(p?+p.slice(1):6)});
+      const b=enc.encode(s);for(const c of b){out.push(c);tty.push(c)}return R(b.length)},
+    *malloc(a){const n=Math.ceil(Math.max(a[0].v,1)/16)*16;let p;
+      if(freeL[n]&&freeL[n].length)p=freeL[n].pop();else{p=hp;hp+=n;if(hp>0x70000)return R(0,ptr(VOID))}
+      sizes[p]=n;u8.fill(0,p,p+n);return R(p,ptr(VOID))},
+    *free(a){const p=a[0].v;if(p)(freeL[sizes[p]]??=[]).push(p);return R(0)},
+    *exit(a){throw{exit:a[0].v}},
+    *isspace(a){return R([9,10,11,12,13,32].includes(a[0].v)?8:0)},
+    *strchr(a){let p=a[0].v;for(;;p++){if(u8[p]===(a[1].v&255))return R(p,PC);if(!u8[p])return R(0,PC)}},
+    *strcspn(a){const rej=[...enc.encode(cstr(a[1].v))];let k=0;while(u8[a[0].v+k]&&!rej.includes(u8[a[0].v+k]))k++;return R(k)},
+    *getchar(){while(qh>=inq.length)yield*wait();const c=inq[qh++];tty.push(c);return R(c)},
+    *fgets(a){const[b,n]=a;
+      for(;;){let c=0,nl=false;for(let k=qh;k<inq.length&&c<n.v-1;k++){c++;if(inq[k]===10){nl=true;break}}
+        if(nl||c>=n.v-1)break;yield*wait()}
+      const q0=qh,ech=[];let k=0;while(k<n.v-1&&qh<inq.length){const c=inq[qh++];u8[b.v+k++]=c;ech.push(c);if(c===10)break}
+      u8[b.v+k]=0;const nl=ech[ech.length-1]===10;if(nl)ech.pop();for(const c of ech)tty.push(c);
+      if(notes[q0])for(const c of enc.encode('   ← '+notes[q0]))tty.push(c);if(nl)tty.push(10);return R(b.v,PC)},
+    *sscanf(a){const s=cstr(a[0].v),f=cstr(a[1].v),W=/\s/;let p=0,n=0,k=2;
+      const fail=()=>R(n||(p>=s.length?-1:0));
+      for(let q=0;q<f.length;q++){const c=f[q];
+        if(W.test(c)){while(W.test(s[p]||""))p++;continue}
+        if(c!=="%"){if(s[p]!==c)return fail();p++;continue}
+        const d=f[++q];
+        if(d==="c"){if(p>=s.length)return fail();u8[a[k++].v]=s.charCodeAt(p++);n++;continue}
+        while(W.test(s[p]||""))p++;
+        const m=(d==="d"?/^[+-]?\d+/:/^[+-]?(\d+\.?\d*|\.\d+)([eE][+-]?\d+)?/).exec(s.slice(p));
+        if(!m)return fail();p+=m[0].length;
+        st(d==="d"?INT:FLT,a[k++].v,d==="d"?parseInt(m[0],10):parseFloat(m[0]));n++}
+      return R(n)}
+  };
+  // ---------- leitura da memória do programa (para a visualização) ----------
+  function rd(t,a){
+    if(t.k==="s"){const o={};for(const f of t.fields)o[f.n]=rd(f.t,a+f.off);return o}
+    if(t.k==="a")return cstr(a,t.n);
+    return ld(t,a)}
+  function snap(){
+    const F=frames[0];if(!F)return null;
+    const g=n=>{for(const s of F.sc)if(s.has(n))return s.get(n)};
+    const f=g("filaPedidos"),h=g("historicoPedidos");if(!f||!h)return null;
+    const walk=(p,T)=>{const L=[];for(let c=0;p&&c<500;c++){const o=rd(T,p);L.push({a:p,p:o.pedido});p=o.proximo}return L};
+    const A=rd(types.Fila,f.a),B=rd(types.Pilha,h.a);
+    return{fila:walk(A.inicio,types.No),pilha:walk(B.topo,types.NoPilha),inicio:A.inicio,fim:A.fim,topo:B.topo,nf:A.quantidade,np:B.quantidade}}
+  function* run(){try{yield* call(funcs.main,[])}catch(e){if(!(e&&"exit"in e))throw e}}
+  function reset(){u8.fill(0);for(const s of strs)u8.set(s.b,s.a);
+    sp=0x80000;hp=0x4000;frames=[];inq=[];qh=0;out=[];tty=[];notes={};freeL={};sizes={};gen=run()}
+  parseAll();reset();
+  return{reset,feed:(s,nota)=>{if(nota)notes[inq.length]=nota;for(const c of enc.encode(s))inq.push(c)},next:()=>gen.next(),saida:()=>dec8.decode(Uint8Array.from(out)),terminal:()=>dec8.decode(Uint8Array.from(tty)),snap};
+}
+
+// Explicações didáticas de cada instrução de fila.c e pilha.c (o código C em si não é alterado)
+const EXPL={
+"inicializarFila|fila->inicio = NULL;":"A fila nasce sem ninguém no início.",
+"inicializarFila|fila->fim = NULL;":"E sem ninguém no fim: a fila começa vazia.",
+"inicializarFila|fila->quantidade = 0;":"Zero pedidos aguardando.",
+"filaVazia|return fila->inicio == NULL;":"A fila está vazia quando o início aponta para NULL. Devolve 1 (vazia) ou 0 (tem pedidos).",
+"No *novo = malloc(sizeof(No));":"Reserva na memória (heap) espaço para um nó novo. O malloc devolve o endereço desse espaço.",
+"if (novo == NULL) {":"Confere se a memória foi mesmo reservada. Se o malloc falhou, a função desiste.",
+"novo->pedido = pedido;":"Copia os dados do pedido (cliente, produto, quantidade e preço) para dentro do nó novo.",
+"adicionarPedido|novo->proximo = NULL;":"O nó novo vai para o final da fila, então ainda não tem ninguém depois dele.",
+"adicionarPedido|if (filaVazia(fila)) {":"Pergunta se a fila está vazia. Se estiver, o nó novo será também o primeiro.",
+"adicionarPedido|fila->inicio = novo;":"Fila vazia: o nó novo passa a ser o início.",
+"fila->fim->proximo = novo;":"Fila com gente: o último nó passa a apontar para o nó novo, encadeando-o no final.",
+"adicionarPedido|fila->fim = novo;":"O nó novo agora é o último da fila.",
+"fila->quantidade++;":"Mais um pedido aguardando.",
+"fila->quantidade--;":"Um pedido a menos aguardando.",
+"adicionarPedido|printf(\"Pedido %d adicionado com sucesso!\\n\", pedido.id);":"Escreve a confirmação na saída do programa.",
+"removerPedido|if (filaVazia(fila)) {":"Antes de remover, confere se existe algum pedido na fila.",
+"removerPedido|printf(\"Nao existem pedidos na fila!\\n\");":"Fila vazia: avisa o usuário.",
+"return 0;":"Falha: não havia nada para devolver, retorna 0.",
+"No *auxiliar = fila->inicio;":"Guarda o endereço do primeiro nó para poder liberá-lo depois.",
+"desempilhar|*pedido = auxiliar->pedido;":"Copia o pedido do nó do topo para a variável de quem chamou a função (o main).",
+"*pedido = auxiliar->pedido;":"Copia o pedido do primeiro nó para a variável de quem chamou a função (o main).",
+"fila->inicio = auxiliar->proximo;":"O início passa a ser o segundo nó: o primeiro acabou de sair da fila.",
+"removerPedido|if (fila->inicio == NULL) {":"Se a fila ficou vazia, o fim também precisa deixar de apontar para o nó removido.",
+"removerPedido|fila->fim = NULL;":"A fila ficou vazia: o fim aponta para NULL.",
+"free(auxiliar);":"Devolve ao sistema a memória do nó removido (evita vazamento de memória).",
+"return 1;":"Deu certo: retorna 1.",
+"mostrarFila|if (filaVazia(fila)) {":"Se não há pedidos, só avisa que a fila está vazia.",
+"mostrarFila|printf(\"Fila vazia!\\n\");":"Avisa que a fila está vazia.",
+"return;":"Não há mais o que fazer: sai da função.",
+"No *atual = fila->inicio;":"Começa a percorrer a lista pelo primeiro nó.",
+"while (atual != NULL) {":"Repete enquanto ainda houver um nó para visitar.",
+"atual = atual->proximo;":"Avança para o próximo nó da lista.",
+"No *auxiliar = atual;":"Guarda o nó atual antes de avançar, para liberá-lo.",
+"inserirInicio|novo->proximo = fila->inicio;":"O nó novo aponta para o antigo primeiro: ele entra na frente da fila.",
+"inserirInicio|fila->inicio = novo;":"O nó novo passa a ser o primeiro da fila.",
+"inserirInicio|if (fila->fim == NULL) {":"Se a fila estava vazia, o nó novo também precisa ser o último.",
+"inserirInicio|fila->fim = novo;":"Fila estava vazia: o nó novo é o primeiro e o último.",
+"inserirInicio|printf(\"Pedido %d recuperado para a fila!\\n\", pedido.id);":"Escreve na saída que o pedido voltou para a fila.",
+"inicializarPilha|pilha->topo = NULL;":"A pilha nasce sem nenhum elemento no topo.",
+"inicializarPilha|pilha->quantidade = 0;":"Zero pedidos no histórico.",
+"pilhaVazia|return pilha->topo == NULL;":"A pilha está vazia quando o topo aponta para NULL. Devolve 1 ou 0.",
+"NoPilha *novo = malloc(sizeof(NoPilha));":"Reserva na memória espaço para um nó novo da pilha.",
+"empilhar|novo->proximo = pilha->topo;":"O nó novo aponta para o antigo topo: fica por cima dele.",
+"pilha->topo = novo;":"O topo agora é o nó novo: o último a entrar é o primeiro a sair.",
+"pilha->quantidade++;":"Mais um pedido no histórico.",
+"pilha->quantidade--;":"Um pedido a menos no histórico.",
+"desempilhar|if (pilhaVazia(pilha)) {":"Antes de remover, confere se há algo no histórico.",
+"desempilhar|return 0;":"Histórico vazio: nada para devolver, retorna 0.",
+"desempilhar|printf(\"Pilha vazia!\\n\");":"Histórico vazio: avisa o usuário.",
+"NoPilha *auxiliar = pilha->topo;":"Guarda o endereço do nó do topo para liberá-lo depois.",
+"pilha->topo = auxiliar->proximo;":"O topo passa a ser o nó de baixo: o antigo topo saiu da pilha.",
+"mostrarPilha|if (pilhaVazia(pilha)) {":"Se o histórico está vazio, só avisa.",
+"mostrarPilha|printf(\"Historico de pedidos vazio!\\n\");":"Avisa que o histórico está vazio.",
+"NoPilha *atual = pilha->topo;":"Começa a percorrer a pilha pelo topo (do mais recente ao mais antigo).",
+"liberarFila|fila->inicio = NULL;":"Zera a fila depois de liberar todos os nós.",
+"liberarFila|fila->fim = NULL;":"Zera a fila depois de liberar todos os nós.",
+"liberarFila|fila->quantidade = 0;":"Zera a fila depois de liberar todos os nós.",
+"liberarPilha|pilha->topo = NULL;":"Zera a pilha depois de liberar todos os nós.",
+"liberarPilha|pilha->quantidade = 0;":"Zera a pilha depois de liberar todos os nós."
+};
+function expl(fn,t){
+  const e=EXPL[fn+"|"+t]??EXPL[t];if(e)return e;
+  let m;
+  if((m=/^printf\(.*atual->pedido\.(\w+)/.exec(t)))return"Escreve na saída o campo «"+m[1]+"» do pedido deste nó.";
+  if(/^printf\("-+/.test(t))return"Escreve uma linha separadora na saída.";
+  if(/^printf\(.*ERRO|Erro ao alocar/i.test(t))return"Avisa que faltou memória.";
+  if(/^printf\(/.test(t))return"Escreve um título na saída do programa.";
+  return"Executa: "+t;
+}
+
+// ---------- Interface: os botões só "digitam" no stdin do programa C ----------
+const $=s=>document.querySelector(s);
+const SRC=JSON.parse($("#fontes").textContent),vm=CVM(SRC);
+let vel=200,tok=0,dest=null,transcript=[],bloq=null,ultimo={fila:[],pilha:[],nf:0,np:0,inicio:0,fim:0,topo:0},fila=Promise.resolve();
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const el=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e};
+const brl=v=>v.toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
+const hex=v=>v?"0x"+v.toString(16):"NULL";
+const agendar=f=>(fila=fila.then(f).catch(e=>{console.error(e);erroC(e)}),fila);
+function erroC(e){bloq="(erro)";$("#term").textContent+="\n[erro de execução] "+(e.message||JSON.stringify(e));avisar("Erro de execução: "+(e.message||e))}
+function avisar(m){const l=$("#log");l.prepend(el("li",null,m));while(l.children.length>6)l.lastChild.remove()}
+// ---------- navegação passo a passo (voltar / pausar / avançar) ----------
+let hist=[],cur=-1,pausado=false,esperando=false,resolver=null,passos=0;
+function mostrar(i){cur=i;painel(hist[i].v);memoria(hist[i].s);ctl()}
+function ctl(){
+  $("#pausa").textContent=pausado?"▶ Continuar":"⏸ Pausar";$("#pausa").classList.toggle("ligado",pausado);
+  $("#volta").disabled=cur<=0;$("#avanca").disabled=!(cur<hist.length-1||esperando);
+  $("#pos").textContent=hist.length?"passo "+(cur+1)+" de "+hist.length:"";
+}
+async function espera(){
+  if(vel&&!pausado)await new Promise(r=>{resolver=r;setTimeout(r,vel)});
+  while(pausado&&!passos){esperando=true;ctl();await new Promise(r=>{resolver=r})}
+  esperando=false;if(passos)passos--;ctl();
+}
+const solta=()=>resolver&&resolver();
+$("#pausa").addEventListener("click",()=>{
+  pausado=!pausado;
+  if(!pausado&&hist.length&&cur<hist.length-1)mostrar(hist.length-1);
+  solta();ctl();
+});
+$("#volta").addEventListener("click",()=>{
+  if(cur<=0)return;
+  if(!pausado){pausado=true;solta()}
+  mostrar(cur-1);
+});
+$("#avanca").addEventListener("click",()=>{
+  if(cur<hist.length-1)mostrar(cur+1);
+  else if(esperando){passos=1;solta()}
+});
+// ---------- execução do programa C ----------
+async function pump(silent){
+  const my=tok;
+  for(;;){
+    const r=vm.next();
+    if(r.done){bloq="(encerrado)";break}
+    const v=r.value;
+    if(v.need){bloq=v.fn;break}
+    if(!silent&&v.file!=="main.c"){
+      hist.push({v,s:vm.snap()});
+      if(cur===hist.length-2)mostrar(hist.length-1);
+      await espera();if(my!==tok)return;
+    }
+  }
+  ctl();
+  const t=vm.terminal().slice(-4000),p=$("#term");p.textContent=t;p.scrollTop=p.scrollHeight;
+}
+const NOTAS={1:"opção 1: cadastrar pedido",2:"opção 2: mostrar pedidos aguardando",3:"opção 3: preparar próximo pedido",4:"opção 4: consultar histórico",5:"opção 5: recuperar último preparado",0:"opção 0: sair"};
+async function enviar(txt,silent){
+  const nota=bloq==="main"?(NOTAS[txt.split("\n")[0].trim()]??"opção inválida"):undefined;
+  if(!silent){hist=[];cur=-1;ctl()}
+  transcript.push(txt);vm.feed(txt,nota);await pump(silent)}
+async function iniciar(cmds){
+  tok++;vm.reset();bloq=null;transcript=[];await pump(true);
+  for(const c of cmds)await enviar(c,true);
+}
+const pronto=()=>{
+  if(bloq==="main")return true;
+  avisar(bloq==="(encerrado)"?"O programa C foi encerrado. Use “Zerar tudo” para executá-lo de novo.":"O programa C está esperando uma entrada (veja a saída do programa). Termine de digitar ou use “Zerar tudo”.");
+  return false};
+// ---------- painel de código: trecho real dos arquivos .c ----------
+function painel(v){
+  const f=v.fn,L=SRC[f.file].split(/\r?\n/);
+  $("#fn").textContent=f.file+" · "+f.name+"() · linha "+v.line;
+  $("#codigo").replaceChildren(...L.slice(f.l0-1,f.l1).map((t,k)=>el("span",f.l0+k===v.line?"on":"",String(f.l0+k).padStart(3," ")+"  "+t)));
+  $("#explica").textContent=expl(f.name,L[v.line-1].trim());
+}
+function cadeia(L,ptrs){
+  const c=el("div","cadeia");
+  for(const n of L){
+    const no=el("div","no"),ch=el("div","chips");
+    for(const[k,v]of Object.entries(ptrs))if(v===n.a)ch.append(el("span","chip",k));
+    no.append(ch,el("div","caixa","#"+n.p.id));c.append(no,el("span","seta","→"));
+  }
+  c.append(el("span","nulo","NULL"));return c;
+}
+function memoria(s){
+  s=s||ultimo;
+  $("#mem-fila").replaceChildren(el("div","mem-t","Fila · quantidade = "+s.nf),cadeia(s.fila,{inicio:s.inicio,fim:s.fim}));
+  $("#mem-pilha").replaceChildren(el("div","mem-t","Pilha · quantidade = "+s.np),cadeia(s.pilha,{topo:s.topo}));
+}
+// ---------- tela (lida da memória do programa C) ----------
+function ticket(p,tag,completo){
+  const t=el("article","ticket"+(p.id===dest?" novo":""));
+  if(tag)t.append(el("span","tag",tag));
+  t.append(el("h3",null,"Pedido #"+p.id),el("p","cli",p.cliente),el("p",null,(completo?p.quantidade+" × ":"")+p.produto));
+  if(completo)t.append(el("p","preco",brl(p.preco)+" cada · total "+brl(p.preco*p.quantidade)));
+  return t;
+}
+function lista(alvo,itens,tag,completo,vazio){
+  $(alvo).replaceChildren(...(itens.length?itens.map((n,i)=>ticket(n.p,i===0?tag:"",completo)):[el("p","vazio",vazio)]));
+}
+function render(){
+  const s=vm.snap();if(s)ultimo=s;
+  lista("#fila",ultimo.fila,"próximo",true,"Nenhum pedido aguardando. Cadastre o primeiro ao lado.");
+  lista("#pilha",ultimo.pilha,"topo",false,"Nenhum pedido preparado ainda.");
+  $("#n-fila").textContent=ultimo.nf;$("#n-pilha").textContent=ultimo.np;
+  $("#preparar").disabled=!ultimo.nf;$("#recuperar").disabled=!ultimo.np;
+  if(cur<0||cur>=hist.length-1)memoria(ultimo);dest=null;
+  try{localStorage.setItem("balcao-c",JSON.stringify(transcript.slice(-3000)))}catch(e){}
+}
+$("#vel").addEventListener("change",e=>{vel=Number(e.target.value)});
+// ---------- operações = opções do menu do main.c ----------
+async function opAdicionar(p){
+  if(!pronto())return;
+  const a=ultimo.nf;
+  await enviar(`1\n${p.cliente}\n${p.produto}\n${p.quantidade}\n${p.preco}\n`);
+  const s=vm.snap();
+  if(s&&s.nf>a){dest=s.fila[s.fila.length-1].p.id;avisar("Pedido #"+dest+" entrou na fila.")}
+  render();
+}
+async function opPreparar(){
+  if(!pronto())return;
+  const a=ultimo.np;await enviar("3\n");const s=vm.snap();
+  if(s&&s.np>a){const p=s.pilha[0].p;dest=p.id;avisar("Pedido #"+p.id+" preparado para "+p.cliente+": "+p.produto+".")}
+  else avisar("Não há pedidos na fila.");
+  render();
+}
+async function opRecuperar(){
+  if(!pronto())return;
+  const a=ultimo.nf;await enviar("5\n");const s=vm.snap();
+  if(s&&s.nf>a){dest=s.fila[0].p.id;avisar("Pedido #"+dest+" voltou para o início da fila.")}
+  else avisar("O histórico está vazio.");
+  render();
+}
+$("#preparar").addEventListener("click",()=>agendar(opPreparar));
+$("#recuperar").addEventListener("click",()=>agendar(opRecuperar));
+document.querySelectorAll("[data-c]").forEach(b=>b.addEventListener("click",()=>agendar(async()=>{if(pronto()){await enviar(b.dataset.c+"\n");render()}})));
+$("#raw").addEventListener("submit",e=>{
+  e.preventDefault();const t=$("#rawin").value;$("#rawin").value="";
+  agendar(async()=>{if(bloq==="(encerrado)"||bloq==="(erro)"){pronto();return}await enviar(t+"\n");render()});
+});
+// ---------- cadastro: valida o mesmo que o main.c antes de digitar no programa ----------
+function erro(c,m){document.querySelector(`[data-erro="${c}"]`).textContent=m}
+const bytes=s=>new TextEncoder().encode(s).length;
+$("#form").addEventListener("submit",e=>{
+  e.preventDefault();const f=e.target;let ok=true;
+  ["cliente","produto","quantidade","preco"].forEach(c=>erro(c,""));
+  const cliente=f.cliente.value.trim(),produto=f.produto.value.trim();
+  for(const[c,v]of[["cliente",cliente],["produto",produto]]){
+    if(!v){erro(c,"O campo não pode ficar vazio.");ok=false}
+    else if(bytes(v)>49){erro(c,"Texto muito longo (máx. 49 bytes).");ok=false}}
+  const q=f.quantidade.value.trim();
+  if(!/^\d+$/.test(q)||+q<=0||+q>2147483647){erro("quantidade","Digite um número inteiro maior que zero.");ok=false}
+  const pr=f.preco.value.trim().replace(",",".");
+  if(!/^\d+(\.\d+)?$/.test(pr)||!(parseFloat(pr)>0)){erro("preco","Digite um valor maior que zero.");ok=false}
+  if(!ok)return;
+  const p={cliente,produto,quantidade:String(+q),preco:pr};
+  f.reset();f.cliente.focus();agendar(()=>opAdicionar(p));
+});
+// ---------- zerar = reiniciar o programa C ----------
+let conf=null;
+$("#zerar").addEventListener("click",e=>{
+  const b=e.currentTarget;
+  if(!conf){b.textContent="Clique de novo para confirmar";conf=setTimeout(()=>{b.textContent="Zerar tudo";conf=null},3000);return}
+  clearTimeout(conf);conf=null;b.textContent="Zerar tudo";
+  tok++;pausado=false;passos=0;solta();
+  agendar(async()=>{await iniciar([]);avisar("Programa C reiniciado: tudo zerado.");render()});
+});
+// ---------- modo automático ----------
+const NOMES=["Ana","Bruno","Carla","Diego","Elisa","Fábio","Gabi","Hugo"];
+const MENU=[["X-Burger",18.9],["Batata grande",12],["Milk-shake",15.5],["Combo duplo",32.9],["Nuggets 10un",19.9],["Refrigerante",7]];
+const sorteio=a=>a[Math.floor(Math.random()*a.length)];
+let auto=false,tokenAuto=0;
+function escolherOp(){
+  const r=Math.random(),s=ultimo;
+  const novo=()=>{const[produto,preco]=sorteio(MENU),p={cliente:sorteio(NOMES),produto,quantidade:String(1+Math.floor(Math.random()*3)),preco:String(preco)};return()=>opAdicionar(p)};
+  if(!s.nf)return(s.np&&r<.15)?opRecuperar:novo();
+  if(s.nf>=5)return opPreparar;
+  if(r<.5)return novo();
+  if(r<.9||!s.np)return opPreparar;
+  return opRecuperar;
+}
+async function loopAuto(){
+  const meu=++tokenAuto;
+  while(auto&&meu===tokenAuto){
+    await agendar(escolherOp());
+    if(auto&&meu===tokenAuto)await sleep(700+vel);
+  }
+}
+$("#auto").addEventListener("click",e=>{
+  auto=!auto;const b=e.currentTarget;
+  b.setAttribute("aria-pressed",auto);b.textContent=auto?"Desligar modo automático":"Ligar modo automático";
+  b.classList.toggle("ligado",auto);if(auto)loopAuto();
+});
+agendar(async()=>{
+  let c=[];try{c=JSON.parse(localStorage.getItem("balcao-c")||"[]")}catch(e){}
+  await iniciar(c);
+  if(bloq!=="main"){await iniciar([])}
+  render();
+});
+
+</script>
+</body>
+</html>
