@@ -626,7 +626,7 @@ compartilhado. Ação: executar `git fetch origin` e
 locais não rastreados (`fastfood`, `fila.o` e `pilha.o`), sem executar
 uma limpeza geral que pudesse removê-los.
 
-## 9. PARTICIPAÇÃO DA ESTUDANTE E USO DA IA
+## 9. PARTICIPAÇÃO DOS ESTUDANTES E USO DA IA
 
 A IA foi utilizada como ferramenta de apoio, não como substituta da
 verificação do programa. As interações recuperáveis envolveram:
@@ -642,11 +642,9 @@ verificação do programa. As interações recuperáveis envolveram:
 -   análise da saída duplicada do histórico;
 -   orientação para commits e sincronização do repositório.
 
-A estudante participou das decisões, executou os comandos no ambiente
-local, forneceu entradas ao programa, observou as saídas, relatou os
-resultados e verificou a correção da duplicação. A compreensão
-individual do código permanece essencial para a apresentação e para
-responder às perguntas do professor.
+Os estudante participaram das decisões, executaram os comandos no ambiente
+local, forneceram entradas ao programa, observaram as saídas, relataram os
+resultados e verificaram a correção da duplicação. 
 
 ## 10. REGISTRO DE SOLICITAÇÕES À IA POR ASSUNTO
 
