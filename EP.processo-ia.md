@@ -373,27 +373,7 @@ Iteração 11 --- Testes de fila vazia e pilha vazia
 -   Resultado: os principais casos de estruturas vazias foram
     verificados.
 
-Iteração 12 --- Teste de cadastro, preparo e recuperação de um pedido
-
--   Data: 09/11/2026.
--   Objetivo: acompanhar o percurso de um pedido entre as duas
-    estruturas.
--   Pedido à IA --- reconstrução: orientar um teste manual de ponta a
-    ponta, desde o cadastro até a preparação e posterior recuperação.
--   Orientação recebida --- síntese: cadastrar um pedido válido,
-    conferir sua presença na fila, preparar o pedido e verificar sua
-    passagem para a pilha; depois recuperá-lo e conferir seu retorno à
-    fila.
--   Teste realizado: foi cadastrado um pedido com cliente Tina, produto
-    hot dog, quantidade 2 e preço unitário `20.2`.
--   Resultados observados: o pedido foi aceito; o valor apareceu
-    formatado como `R$ 20.20`; ao preparar, saiu da fila e foi
-    armazenado na pilha; ao recuperar, saiu da pilha e retornou ao
-    início da fila.
--   Encerramento: a opção `0` encerrou o programa normalmente.
--   Resultado: fluxo básico de movimentação do pedido verificado.
-
-Iteração 13 --- Teste combinado para demonstrar FIFO e LIFO
+Iteração 12 --- Teste combinado para demonstrar FIFO e LIFO
 
 -   Data: 09/11/2026.
 -   Objetivo: verificar a ordem das operações com mais de um pedido, em
