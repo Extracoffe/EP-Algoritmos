@@ -626,19 +626,7 @@ compartilhado. Ação: executar `git fetch origin` e
 locais não rastreados (`fastfood`, `fila.o` e `pilha.o`), sem executar
 uma limpeza geral que pudesse removê-los.
 
-## 9. HISTÓRICO DE VERSÕES NO GITHUB
-
-9.1 Commit `85d781d` --- `Adiciona backend de gerenciamento de pedidos`
-    https://github.com/Extracoffe/EP-Algoritmos/commit/85d781d
-
-9.2 Commit `3433f50` --- `Ajusta exibicao do historico de pedidos`
-    https://github.com/Extracoffe/EP-Algoritmos/commit/3433f50
-
-O primeiro commit registra a inclusão inicial dos arquivos-fonte do
-backend. O segundo registra a correção da duplicação do título na
-consulta dos pedidos preparados.
-
-## 10. PARTICIPAÇÃO DA ESTUDANTE E USO DA IA
+## 9. PARTICIPAÇÃO DA ESTUDANTE E USO DA IA
 
 A IA foi utilizada como ferramenta de apoio, não como substituta da
 verificação do programa. As interações recuperáveis envolveram:
@@ -660,7 +648,7 @@ resultados e verificou a correção da duplicação. A compreensão
 individual do código permanece essencial para a apresentação e para
 responder às perguntas do professor.
 
-## 11. REGISTRO DE SOLICITAÇÕES À IA POR ASSUNTO
+## 10. REGISTRO DE SOLICITAÇÕES À IA POR ASSUNTO
 
 Esta seção consolida os principais pedidos que aparecem ao longo das
 iterações. São reconstruções temáticas dos prompts, não transcrições
@@ -720,26 +708,8 @@ no link registrado na seção 1.2.
 16. Verificação final: solicitação de confirmação do comportamento após
     a correção e do registro do novo commit.
 
-## 12. CONFERÊNCIA FINAL DOS MATERIAIS DE ENTREGA
 
--   [ ] Código-fonte do backend atualizado no repositório.
--   [ ] Demonstração preparada com cadastro, consulta, preparo e
-    recuperação.
--   [ ] Cenário com mais de um pedido preparado para demonstrar FIFO e
-    LIFO.
--   [ ] Explicação da escolha da fila e da pilha e da função de cada
-    módulo.
--   [ ] Diário cronológico do processo de desenvolvimento incluído.
--   [ ] Link da conversa original com a IA incluído e testado em janela
-    anônima ou em outro navegador.
--   [ ] Se houver outros integrantes que utilizaram IA em conversas
-    separadas, respectivos históricos também disponibilizados.
--   [ ] Datas e detalhes conferidos com os registros originais sempre
-    que possível.
--   [ ] Capturas de tela dos principais testes e da demonstração
-    incluídas, caso sejam solicitadas ou ajudem a comprovar o resultado.
-
-## 13. LIMITES E DECLARAÇÃO DE FIDELIDADE
+## 11. LIMITES E DECLARAÇÃO DE FIDELIDADE
 
 Este documento registra as etapas e os fatos que puderam ser recuperados
 sobre o desenvolvimento do backend. Não afirma que houve testes ou
