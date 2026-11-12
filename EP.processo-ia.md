@@ -504,6 +504,46 @@ Iteração 18 --- Segundo commit e envio da correção
 -   Link: https://github.com/Extracoffe/EP-Algoritmos/commit/3433f50
 -   Resultado: o commit foi enviado com sucesso para a branch `main`.
 
+Iteração 19 --- Implementação do interpretador C no site de demonstração
+
+-   Data: 12/11/2026.
+
+-   Objetivo: fazer o site de demonstração executar o código C original (fila e pilha), sem reescrever para JavaScript ou Java.
+
+-   Pedido à IA --- reconstrução: solicitar que a IA refaça o site para utilizar o código C nativo sem alterações, mantendo a demonstração do sistema funcional.
+
+-   Procedimento: a IA desenvolveu um interpretador de C em JavaScript embutido na página, permitindo ler e executar os arquivos originais (main.c, fila.c, pilha.c, etc.) diretamente. A IA também implementou manipulação       de stdin/stdout através da interface.
+
+-   Resultado observado: os sete arquivos C rodam nativamente na página via interpretador com resultados idênticos aos de um binário compilado com gcc. Foram adicionados painéis para a saída do programa e novos botões de      navegação no menu.
+
+-   Conclusão: o site agora simula perfeitamente o ambiente C no navegador sem a necessidade de reescrita de código.
+
+Iteração 20 --- Ajuste da interface de memória, terminal e explicações do código
+
+-   Data: 12/11/2026.
+
+-   Objetivo: corrigir a exibição visual da memória (retirando endereços), exibir corretamente os inputs no terminal e detalhar as explicações do código ao vivo.
+
+-   Pedido à IA --- reconstrução: solicitar a remoção de endereços como @0x4080, voltar a exibir os detalhes do pedido, incluir o registro visual do que foi digitado no stdout e restaurar as explicações detalhadas linha a     linha.
+
+-   Procedimento: a IA ocultou os endereços de memória mantendo apenas os rótulos lógicos (inicio, fim, topo), atualizou o console para exibir um histórico interativo das opções escolhidas (ex: 1 ← opção 1) e adicionou        explicações textuais em português vinculadas à execução de cada linha em fila.c e pilha.c.
+
+-   Resultado observado: a memória voltou a exibir dados amigáveis, o terminal reflete as interações de input perfeitamente, e a execução do código exibe a explicação didática a cada passo.
+
+Iteração 21 --- Adição de controles de navegação passo a passo
+
+-   Data: 12/11/2026.
+
+-   Objetivo: permitir ao usuário pausar, voltar e avançar a execução do código ao vivo para facilitar a leitura das explicações.
+
+-   Pedido à IA --- reconstrução: solicitar a adição de botões de controle temporal (voltar/avançar) caso o usuário não tenha tempo de ler as descrições das linhas.
+
+-   Procedimento: a IA inseriu botões de ◀ Voltar, ⏸ Pausar / ▶ Continuar e Avançar ▶, junto a um contador de passos na interface. A execução passou a ser armazenada em histórico para permitir retrocesso.
+
+-   Resultado observado: o usuário consegue congelar a execução a qualquer momento, rever passos já executados para reler as explicações com calma, e avançar de forma controlada.
+
+-   Conclusão: o ambiente didático foi aprimorado, garantindo que o usuário tenha controle total sobre a velocidade de demonstração do algoritmo.
+
 ## 5. ORGANIZAÇÃO TÉCNICA DOS ARQUIVOS
 
 | Arquivo | Responsabilidade |
